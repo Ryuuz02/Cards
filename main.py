@@ -1,7 +1,9 @@
+# Import statements
 from random import choice
 from time import sleep
 
 
+# Function that takes in a question, the prompts the user for a yes or no, and returns the corresponding value
 def question_true_false(question):
     answer = input(question + "? Y/N\n").lower()
     if answer == "y":
@@ -10,10 +12,13 @@ def question_true_false(question):
         return False
 
 
+# returns a random letter in deck of cards
 def pick_a_card():
     return choice(deck_of_cards)
 
 
+# Takes a card letter ("J, Q, K, A, or a number) and converts it to that value as a string for easy reading, also adds
+# suit
 def return_card(chosen_card):
     card_number = " "
     if len(chosen_card) == 2:
@@ -37,6 +42,7 @@ def return_card(chosen_card):
     return "a" + card_number + " of " + card_suit
 
 
+# Does the exact same as above, just doesn't inclue suit
 def return_card_name(chosen_card):
     card_number = ""
     if len(chosen_card) == 2:
@@ -55,10 +61,12 @@ def return_card_name(chosen_card):
     return card_number
 
 
+# Returns a random card
 def return_random_card():
-    return_card(pick_a_card())
+    return return_card(pick_a_card())
 
 
+# Converts the suit letter to the whole suit name
 def suit_letter_to_suit(letter):
     if letter == "h":
         return "hearts"
@@ -72,6 +80,7 @@ def suit_letter_to_suit(letter):
         return "no suit"
 
 
+# Creates our deck, 1 card of each suit (A-K)
 def create_deck():
     added_card = 0
     for card in range(1, 14):
@@ -104,6 +113,7 @@ def create_deck():
     """
 
 
+# Prints the hand of the player or dealer, based on which one it matches
 def print_hand(input_hand):
     if input_hand == player_hand:
         total_hand = "You hold "
@@ -122,6 +132,7 @@ def print_hand(input_hand):
     print(total_hand)
 
 
+# Calculates the value of a hand
 def calculate_hand(hand):
     global player_blackjack
     global dealer_blackjack
@@ -136,6 +147,7 @@ def calculate_hand(hand):
             total += 10
         else:
             total += int(hand[card][0])
+    # Logic for aces being 11 or 1
     while aces_in_hand > 0:
         if aces_in_hand == len(hand):
             return len(hand)
@@ -151,6 +163,7 @@ def calculate_hand(hand):
         else:
             total += 1
             aces_in_hand -= 1
+    # Check for busts
     if total > 21:
         if hand == player_hand:
             player_bust = True
@@ -159,6 +172,7 @@ def calculate_hand(hand):
     return total
 
 
+# Deals out the cards to player and dealer
 def deal_cards_blackjack():
     global player_total
     global dealer_total
@@ -171,6 +185,7 @@ def deal_cards_blackjack():
     dealer_total = calculate_hand(dealer_hand)
 
 
+# picks a random card from the deck to deal, if asked to print, will tell what is drawn
 def deal_card(printout):
     dealt_card = pick_a_card()
     deck_of_cards.remove(dealt_card)
@@ -179,29 +194,37 @@ def deal_card(printout):
     return dealt_card
 
 
+# Main logic function for blackjack
 def begin_play_blackjack():
+    # Assigning variables
     create_deck()
     global dealer_total
     global player_total
     playing = True
     deal_cards_blackjack()
     print("The dealer is showing " + return_card(dealer_hand[0]))
+    # While both players are in the game
     while playing and not player_bust and not dealer_bust:
         player_has_hit = False
         dealer_has_hit = False
         print_hand(player_hand)
+        # Asks user if they want to hit or not
         hit_choice = question_true_false("Would you like to hit")
         if hit_choice:
+            # If they do, adds a card
             print("->Hit<-")
             player_hand.append(deal_card(True))
             player_total = calculate_hand(player_hand)
             player_has_hit = True
         if dealer_total <= 17:
+            # Dealer A.I.
             print("The dealer will hit, bringing them to " + str(len(dealer_hand) + 1) + " cards")
             dealer_hand.append(deal_card(False))
             dealer_total = calculate_hand(dealer_hand)
             dealer_has_hit = True
         if not dealer_has_hit and not player_has_hit:
+            # If both player and dealer stand, will compare hands
+            # Prints out the end result
             print_hand(dealer_hand)
             print("\nYou have a total of " + str(player_total) + " points\n")
             print("The dealer has a total of " + str(dealer_total) + " points\n")
@@ -222,12 +245,14 @@ def begin_play_blackjack():
         print("You've busted and have lost")
     elif dealer_bust:
         print("The dealer has busted and you win")
+    # Asks if they want to play again
     play_again_choice = question_true_false("Would you like to play again")
     if play_again_choice:
         reset()
         begin_play_blackjack()
 
 
+# Resets variables to start values
 def reset():
     global deck_of_cards
     global player_total
@@ -250,6 +275,7 @@ def reset():
     dealer_blackjack = False
 
 
+# Deals out the entire deck evenly
 def deal_deck():
     for i in range(0, 52):
         if i % 2 == 0:
@@ -258,23 +284,29 @@ def deal_deck():
             player_hand.append(deal_card(False))
 
 
+# Logic function for War
 def compare_top_card():
     global card_pool
     dealer_card = dealer_hand.pop(0)
     player_card = player_hand.pop(0)
+    # Tells the player the cards
     print("You show " + return_card(player_card))
     print("The dealer shows " + return_card(dealer_card))
     card_pool += [player_card, dealer_card]
     player_num = convert_card_to_number(player_card)
     dealer_num = convert_card_to_number(dealer_card)
+    # If the player card is higher than the dealer's card, they win
     if player_num > dealer_num:
         print("You have won the war and your spoils have been added to your deck")
         for i in range(0, len(card_pool)):
             player_hand.append(card_pool[i])
+    # If not, dealer wins
     elif dealer_num > player_num:
         print("The dealer has won the war and their spoils have been added to their deck")
         for i in range(0, len(card_pool)):
             dealer_hand.append(card_pool[i])
+    # If they are the same, follows traditional war rules then compares the cards to see who wins, will continue until
+    # someone wins
     else:
         print("<----!The war continues, both sides must put 2 cards face down to fight over!---->")
         if len(player_hand) > 2 and len(dealer_hand) > 2:
@@ -291,6 +323,7 @@ def compare_top_card():
     card_pool = []
 
 
+# converts the card name to value (j,q,k,a to 11, 12, 13, 14, otherwise its face value)
 def convert_card_name_to_number(card_name):
     if card_name in word_to_value_dict:
         return word_to_value_dict[card_name]
@@ -298,10 +331,12 @@ def convert_card_name_to_number(card_name):
         return int(card_name)
 
 
+# Does the same, but with a shortened card name input
 def convert_card_to_number(chosen_card):
     return convert_card_name_to_number(return_card_name(chosen_card))
 
 
+# Function loop for war
 def begin_play_war():
     deal_deck()
     playing = True
@@ -316,7 +351,7 @@ def begin_play_war():
         reset()
         begin_play_war()
 
-
+# Assigning base values for variables
 word_to_value_dict = {"Ace": 14, "King": 13, "Queen": 12, "Jack": 11}
 deck_of_cards = []
 create_deck()
@@ -330,6 +365,7 @@ dealer_bust = False
 player_blackjack = False
 dealer_blackjack = False
 playing_game = True
+# Main function loop for every card game
 while playing_game:
     game_choice = input("What game would you like to play? (type the number)"
                         "\n 0: Exit"
