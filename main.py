@@ -100,7 +100,7 @@ class game():
 # test_deck = deck(jokers=True)
 # print(test_deck.pick_card_with_replacement())
 
-test_game = game(2, 2, True)
-test_game.deal(26)
-print(test_game.players)
-print(test_game.deck)
+# test_game = game(2, 2, True)
+# test_game.deal(26)
+# print(test_game.players)
+# print(test_game.deck)
